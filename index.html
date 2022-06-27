@@ -15,7 +15,9 @@
         (!('@guisolidapi:colorTheme' in localStorage) &&
           window.matchMedia('(prefers-color-scheme: dark)').matches)
       ) {
+        console.log('aa')
         document.documentElement.classList.add('dark');
+
       } else {
         document.documentElement.classList.remove('dark');
       }

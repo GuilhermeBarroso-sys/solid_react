@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -25,7 +25,10 @@ export function LoginScreen() {
 	const currentYear = new Date().getFullYear()
 	const [validEmail, setValidEmail] = useState(true);
 	const [validPassword, setValidPassword] = useState(false);
-  const {signIn} = useContext(AuthContext)
+  const {signIn, isAuthenticated} = useContext(AuthContext)
+  useEffect(() => {
+    isAuthenticated() && navigate('/')
+  },[])
   const onSubmit : SubmitHandler<Inputs> = async ({email,password}) => {
     const success = await signIn({email,password})
     success ? navigate('/home') : Swal.fire('Erro', 'Nao foi possivel autenticar, por favor verifique as credenciais.', 'error')
@@ -69,7 +72,7 @@ export function LoginScreen() {
 								<button
 									disabled = {!validEmail || !validPassword ?  true : false } 
 									className={
-										!validEmail || !validPassword ?" bg-blue-300 cursor-not-allowed text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline " : "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline "
+										!validEmail || !validPassword ?" bg-blue-300 cursor-not-allowed dark:bg-[#4f545c] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline " : "bg-blue-500 hover:bg-blue-700 dark:bg-[#1b1f25] dark:hover:bg-[#222831] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline "
 									} type="submit" >Entrar</button>
 							</div>
 						</form>

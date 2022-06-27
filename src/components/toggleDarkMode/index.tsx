@@ -1,22 +1,8 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { DarkMode } from "../../contexts/darkMode";
 
 export function ToggleDarkMode() {
-  const initialState = localStorage.getItem('@guisolidapi:colorTheme') != 'dark' ? 'light' : 'dark' ;
-  const [colorTheme, setColorTheme] = useState(initialState)
-
-  useEffect(() => {
-      localStorage.setItem('@guisolidapi:colorTheme', colorTheme)
-      if(colorTheme == 'dark') {
-        document.documentElement.classList.add('dark')
-        document.body.style.backgroundColor = '#171717'
-      } 
-      else {
-        document.documentElement.classList.remove('dark')
-        document.body.style.backgroundColor = '#d3d0df'
-
-      }
-      
-  }, [colorTheme])
+  const { colorTheme, setColorTheme} = useContext(DarkMode)
   return (
 
   <label className="inline-flex items-center cursor-pointer relative right-0 mt-10" style={{left:'80vw'}}>

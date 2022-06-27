@@ -1,0 +1,21 @@
+
+* {
+  padding:0;
+  margin:0;
+  box-sizing: border-box;
+  
+}
+body {
+  background-color: #d3d0df;
+  font-family: 'Roboto';
+  transition: 0.3s;
+}
+body,html {
+  height: 100%;
+  border-radius: 0;
+
+}
+
+.black { 
+  color: #1B2430
+}

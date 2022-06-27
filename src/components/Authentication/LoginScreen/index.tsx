@@ -40,7 +40,7 @@ export function LoginScreen() {
 	return (
     <>
     <ToggleDarkMode />
-		<div className="flex w-100 justify-center mt-40 dark:border-yellow">
+		<div className="flex w-100 justify-center mt-10 dark:border-yellow">
 			<div className="w-2/3  flex flex-row min-h-fit h-auto">
 				<div className="w-full md:w-1/2 bg-white dark:bg-[#2C2E43] dark:text-[#ffff] rounded-l-md flex flex-col items-center md:justify-center  ">
 					<h1 className="font-bold text-4xl black md:mt-40 mt-20 dark:text-[#ffff]">Entrar</h1>
@@ -53,7 +53,7 @@ export function LoginScreen() {
 								<input {...register("email", {required: true})} required onChange={( { target : {value} } ) => {
 									isValidEmail(value) ? setValidEmail(true) : setValidEmail(false);
 								}} className={validEmail ? "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" : "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-red-500"} id="email" type="email" placeholder="email" />
-                {errors.email && <span>Esse campo eh obrigatorio</span>}
+            
 							</div>
 							<div className="mb-1">
 								<label className="block text-gray-700 dark:text-[#ffff]  text-sm font-bold mb-2" htmlFor="password">
@@ -62,7 +62,7 @@ export function LoginScreen() {
 								<input  {...register("password", {required: true})} required onChange={( { target: { value }}) => {
 									value.length >= 1 ? setValidPassword(true) : setValidPassword(false);
 								}} className={"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"} id="password" type="password" placeholder="******************" />
-                {errors.password && <span className="dark:text-[#ffff] text-black">Esse campo eh obrigatorio</span>}
+    
 
 							</div>
 							<div className="flex items-start flex-col">

@@ -1,7 +1,7 @@
 {
     "env": {
-        "es2021": true,
-        "node": true
+        "browser": true,
+        "es2021": true
     },
     "extends": [
         "eslint:recommended",
@@ -18,10 +18,10 @@
     },
     "plugins": [
         "react",
-        "@typescript-eslint",
-        
+        "@typescript-eslint"
     ],
     "rules": {
+       "react/react-in-jsx-scope": "off",
         "indent": [
             "error",
             "tab"
@@ -40,7 +40,6 @@
         "semi": [
             "error",
             "always"
-        ],
-        "react/react-in-jsx-scope": "off"
+        ]
     }
 }

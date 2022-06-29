@@ -5,10 +5,10 @@
   box-sizing: border-box;
   
 }
-body {
+body{
   background-color: #d3d0df;
   font-family: 'Roboto';
-  transition: 0.3s;
+  
 }
 body,html {
   height: 100%;

@@ -39,7 +39,7 @@ const localStorageTokenKey = "@guisolidapi:token";
 export const AuthContext = createContext({} as ICreateContextData);
 
 export function AuthProvider(props : AuthProvider) {
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 	const [user,setUser] = useState<User|null>(null);
   
 	useEffect(() => {
@@ -51,22 +51,22 @@ export function AuthProvider(props : AuthProvider) {
 					setUser(user);
 				})
 				.catch(() => {
-					navigate("/login");
+					// navigate("/login");
 				});
 		}
 	}, []);
 
 	function signOut() {
 		localStorage.removeItem(localStorageTokenKey);
-		navigate("/login");
+		// navigate("/login");
 
 	}
 
-  function isAuthenticated() {
+	function isAuthenticated() {
 		const token = localStorage.getItem(localStorageTokenKey);
 
-    return token ? true : false
-  }
+		return token ? true : false;
+	}
 	async function signIn({email,password} : ISignInParams) : Promise<boolean> {
 		try {
 			const {data : { user , token } } = await api.post<ISignInResponse>("users/authenticate", {email,password});

@@ -4,6 +4,8 @@ import { ReactNode, useContext, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { AuthContext } from "../../contexts/auth";
 import { api } from "../../services/api";
+import { DeleteButton } from "../Button/DeleteButton";
+import { EditButton } from "../Button/EditButton";
 import { Navbar } from "../Navbar";
 import { Table } from "../Table";
 import { ToggleDarkMode } from "../toggleDarkMode";
@@ -20,19 +22,6 @@ export function Users() {
 
 	const {user} = useContext(AuthContext);
 	const [rows, setRows] = useState<TUsers[]>([]);
-	// async function makeTable() : Promise<ReactNode[][]>{
-	// 	const data = await fetchUsers();
-	// 	const rowsData = await Promise.all(data.map((user, index) => {
-	// 		return [
-	// 			user.id,
-	// 			user.username,
-	// 			user.email,
-		
-      
-	// 	}
-	// 	));
-	// 	return rowsData;
-	// }
 	const columns = [
 		{ name: "id", header: "Id", defaultVisible: false, defaultWidth: 60, type: "number" },
 		{ name: "username", header: "Name", defaultFlex: 1 },
@@ -43,11 +32,32 @@ export function Users() {
 	useEffect(() => {
 		if(user) {
 			fetchUsers().then((users) => {
-				setRows(users);
+				setRows(users.filter(tableUsers => tableUsers.id !== user.id));
 			});
 		}
 	}, [user]);
-
+	async function destroyUser(id : string) {
+		try {
+			const {isConfirmed} = await Swal.fire({
+				title: "Tem certeza?",
+				text: "Uma vez deletado, você não conseguira recuperar esse dado!",
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#d33",
+				cancelButtonColor: "gray",
+				cancelButtonText: "Cancelar!",
+				confirmButtonText: "Sim, prosseguir!"
+			});
+			if(isConfirmed) {
+				await api.delete(`users/${id}`); 
+				const users = await fetchUsers();
+				setRows(users.filter(tableUsers => tableUsers.id !== user?.id));
+				Swal.fire("Deletado!", "Usuário deletado com sucesso!", "success");
+			}
+		} catch( err ) {
+			Swal.fire("Algo deu errado", "Algo deu errado! Tente novamente", "error");
+		}
+	}
 	async function fetchUsers() : Promise<TUsers[]> {
 		const users = await api.get<TUsers[]>("users");
 		const usersArray : Array<TUsers> = []; 
@@ -55,19 +65,7 @@ export function Users() {
 			usersArray.push({
 				...item, 
 				options: 	
-                <div className="text-center">
-                	<button onClick={() => {console.log(item.id, item.email);}}>
-                		<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                			<path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"  />
-                		</svg>
-                	</button>
-
-                	<button>
-                		<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                			<path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                		</svg>  
-                	</button> 
-                </div>
+                <div className="text-center"> <EditButton onClickFunction={() => {}}/> <DeleteButton onClickFunction={() => destroyUser(item.id)}/> </div>
 			});
 		}));
 		return usersArray;
@@ -78,9 +76,13 @@ export function Users() {
 			<Navbar />
 			<div className="w-full ">
 				<ToggleDarkMode />
-    
 			</div>
 			<div className="w-3/4 mx-auto">
+				<div className="text-left mb-3">
+					<svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-green-600 dark:text-green-300" viewBox="0 0 20 20" fill="currentColor">
+						<path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+					</svg>
+				</div>
 				<Table data={rows} columns={columns} checkboxColumn={true}/>
 			</div>
 		</>

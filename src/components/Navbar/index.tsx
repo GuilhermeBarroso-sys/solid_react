@@ -1,3 +1,5 @@
+import { ToggleDarkMode } from "../toggleDarkMode";
+
 export function Navbar() {
 	return (
 		<header>
@@ -29,6 +31,7 @@ export function Navbar() {
 							</div>
 							<input type="text" id="search-navbar" className="block p-2 pl-10 w-full text-gray-900 bg-gray-50 rounded-lg border border-gray-300 sm:text-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search..." />
 						</div>
+						
 						<ul className="flex flex-col mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium">
 							<li>
 								<a href="#" className="block py-2 pr-4 pl-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white" aria-current="page">Home</a>
@@ -43,6 +46,7 @@ export function Navbar() {
 					</div>
 				</div>
 			</nav>
+			 <ToggleDarkMode />					
 		</header>
 	);
 }

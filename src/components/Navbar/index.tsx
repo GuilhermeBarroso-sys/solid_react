@@ -24,7 +24,7 @@ export function Navbar() {
 			<nav className="bg-white border-gray-200 px-2 sm:px-4 py-2.5 rounded dark:bg-[#222831]">
 				
 				<div className="container flex flex-wrap justify-between items-center mx-auto">
-					<a href="https://flowbite.com/" className="flex items-center">
+					<a target={"_blank"} href="https://github.com/guilhermebarroso-sys" className="flex items-center" rel="noreferrer">
 						<span className="self-center text-xl font-semibold whitespace-nowrap dark:text-white font-sans">MyTemplate</span>
 					</a>
 					<div className="flex md:order-2">

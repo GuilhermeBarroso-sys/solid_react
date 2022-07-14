@@ -1,4 +1,6 @@
 
+import { TypeRowSelection } from "@inovua/reactdatagrid-community/types";
+import { TypeOnSelectionChangeArg } from "@inovua/reactdatagrid-community/types/TypeDataGridProps";
 import { ReactNode, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -22,6 +24,7 @@ export function Users() {
 
 	const {user} = useContext(AuthContext);
 	const [rows, setRows] = useState<TUsers[]>([]);
+	const [selectedUsersId, setSelectedUsersId] = useState<string[]>([]);
 	const navigate = useNavigate();
 	const columns = [
 		{ name: "id", header: "Id", defaultVisible: false, defaultWidth: 60, type: "number" },
@@ -37,6 +40,7 @@ export function Users() {
 			});
 		}
 	}, [user]);
+
 	async function destroyUser(id : string) {
 		try {
 			const {isConfirmed} = await Swal.fire({
@@ -53,6 +57,29 @@ export function Users() {
 				await api.delete(`users/${id}`); 
 				const users = await fetchUsers();
 				setRows(users.filter(tableUsers => tableUsers.id !== user?.id));
+			
+				Swal.fire("Deletado!", "Usuário deletado com sucesso!", "success");
+			}
+		} catch( err ) {
+			Swal.fire("Algo deu errado", "Algo deu errado! Tente novamente", "error");
+		}
+	}
+	async function destroyAllSelectedUsers() {
+		try {
+			const {isConfirmed} = await Swal.fire({
+				title: "Tem certeza?",
+				text: `Você está prestes a deletar ${selectedUsersId.length} Usuários! Uma vez deletado, você não conseguira recuperar esse dado!`,
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#d33",
+				cancelButtonColor: "gray",
+				cancelButtonText: "Cancelar!",
+				confirmButtonText: "Sim, prosseguir!"
+			});
+			if(isConfirmed) {
+				const users = await fetchUsers();
+				setRows(users.filter(tableUsers => tableUsers.id !==  user?.id));
+				setSelectedUsersId([]);
 				Swal.fire("Deletado!", "Usuário deletado com sucesso!", "success");
 			}
 		} catch( err ) {
@@ -66,7 +93,7 @@ export function Users() {
 			usersArray.push({
 				...item, 
 				options: 	
-                <div className="text-center"> <EditButton onClickFunction={() => {}}/> <DeleteButton onClickFunction={() => destroyUser(item.id)}/> </div>
+                <div className="text-center"> <EditButton onClickFunction={() => {navigate(`/users/${item.id}`);}}/> <DeleteButton onClickFunction={() => destroyUser(item.id)}/> </div>
 			});
 		}));
 		return usersArray;
@@ -82,7 +109,14 @@ export function Users() {
 						<path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
 					</svg>
 				</div>
-				<Table data={rows} columns={columns} checkboxColumn={true}/>
+				<div className="text-right mb-5 h-8">
+					{selectedUsersId.length > 1 &&	<button onClick={destroyAllSelectedUsers} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4py-2 px-4 rounded">Deletar selecionados</button>}
+				</div>
+				<Table data={rows} columns={columns} checkboxColumn={true} resetRowsSelectedTrigger={rows} handleOnSelectionChange={(selected) => {
+					const ids = Object.values(selected).map(({id}) => {return id;});
+					setSelectedUsersId(ids);
+
+				}} />
 			</div>
 		</>
 	);

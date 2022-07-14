@@ -1,37 +1,60 @@
 import { Navbar } from "../../Navbar";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import loginTheme from "../../../assets/loginTheme.svg";
 import { AuthContext } from "../../../contexts/auth";
+import { api } from "../../../services/api";
+import { ToggleDarkMode } from "../../toggleDarkMode";
 type Inputs = {
   username: string
   email: string,
   password: string,
 };
+type TUsers = {
+  id: string
+  username: string
+  email: string
+}
+export function EditUser() {
+	const {user} = useContext(AuthContext);
+	const [userData, setUserData] = useState<TUsers>({id: "", email: "", username: "" });
+	useEffect(() => {
+		if(user) {
+			const { pathname } = window.location;
+			const [,,id] = pathname.split("/");
+			api.get<TUsers>(`users/${id}`).then((response) => {
+				if(response.status != 200 || !response.data) {
+					navigate("/users");
+				}
+				setUserData(response.data);
+			});
+		}
 
-export function CreateUser() {
+	}, [user]);
 	const {register, handleSubmit, formState: { errors }, reset} = useForm<Inputs>();
 	const [validEmail, setValidEmail] = useState(true);
-	const [validPassword, setValidPassword] = useState(false);
-	const {signUp} = useContext(AuthContext);
 	const navigate = useNavigate();
-	const onSubmit : SubmitHandler<Inputs> = async ({username, email,password}) => {
-		const success = await signUp({username, email,password});
+	const onSubmit : SubmitHandler<Inputs> = async ({username, email}) => {
+		const success = await api.put(`users/${userData?.id}`, {
+			username, 
+			email
+		});
 		if(success) {
-			Swal.fire("Sucesso!", "Usuario criado com sucesso", "success"); 
+			setUserData({id: userData.id, username, email});
+			Swal.fire("Sucesso!", "Usuario atualizado com sucesso", "success"); 
 			reset();
 		}
 		else {
-			Swal.fire("Erro!", "Esse email já foi cadastrado!", "error");
-
+			Swal.fire("Erro!", "Algo deu errado! Tente novamente mais tarde", "error");
 		} 
-
 	};
 	function isValidEmail(email: string) : boolean {
 		const emailRegexTemplate =  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 		return email.match(emailRegexTemplate) ? true : false;
 	}
+
 	return (
 		<>
 			<Navbar />
@@ -55,31 +78,22 @@ export function CreateUser() {
 									<label className="block text-gray-700 dark:text-[#ffff] text-lg font-bold mb-2" htmlFor="email">
                   Username
 									</label>
-									<input {...register("username", {required: true})} required className={"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"} id="username" type="username" placeholder="Nome do Usuario" />
+									<input {...register("username", {required: true})} defaultValue={userData.username} required className={"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"} id="username" type="username" placeholder="Nome do Usuario" />
 								</div>
 								<div className="mb-4">
 									<label className="block text-gray-700 dark:text-[#ffff] text-lg font-bold mb-2" htmlFor="email">
                   email
 									</label>
-									<input {...register("email", {required: true})} required onChange={( { target : {value} } ) => {
+									<input {...register("email", {required: true})} defaultValue={userData.email} required onChange={( { target : {value} } ) => {
 										isValidEmail(value) ? setValidEmail(true) : setValidEmail(false);
 									}} className={validEmail ? "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" : "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-red-500"} id="email" type="email" placeholder="email" />
 								</div>
-								<div className="mb-1">
-									<label className="block text-gray-700 dark:text-[#ffff]  text-lg font-bold mb-2" htmlFor="password">
-                  Senha
-									</label>
-									<input  {...register("password", {required: true})} required onChange={( { target: { value }}) => {
-										value.length >= 1 ? setValidPassword(true) : setValidPassword(false);
-									}} className={"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"} id="password" type="password" placeholder="******************" />
-    
-
-								</div>
+							
 								<div className="flex items-center flex-col">
 									<button
-										disabled = {!validEmail || !validPassword ?  true : false } 
+										disabled = {!validEmail ?  true : false } 
 										className={
-											!validEmail || !validPassword ?" bg-green-300 cursor-not-allowed dark:bg-[#4f545c] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline " : "bg-green-500 hover:bg-green-700 dark:bg-[#1b1f25] dark:hover:bg-[#222831] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline "
+											!validEmail ?" bg-green-300 cursor-not-allowed dark:bg-[#4f545c] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline " : "bg-green-500 hover:bg-green-700 dark:bg-[#1b1f25] dark:hover:bg-[#222831] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline "
 										} type="submit" >Criar</button>
 								</div>
 							</form>

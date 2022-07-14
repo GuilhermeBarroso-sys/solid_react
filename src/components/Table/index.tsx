@@ -2,7 +2,7 @@ const gridStyle = { minHeight: 550 };
 import ReactDataGrid from "@inovua/reactdatagrid-community";
 import { TypeRowSelection, TypeCellSelection } from "@inovua/reactdatagrid-community/types";
 import { TypeOnSelectionChangeArg } from "@inovua/reactdatagrid-community/types/TypeDataGridProps";
-import { ReactNode, useCallback, useContext, useState } from "react";
+import { ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { List } from "react-content-loader";
 import { DarkMode } from "../../contexts/darkMode";
 
@@ -10,6 +10,8 @@ import { DarkMode } from "../../contexts/darkMode";
 interface TableProps {
   data: Record<string, ReactNode>[]
   checkboxColumn?: true|undefined
+  handleOnSelectionChange?: (selected : TypeOnSelectionChangeArg| Record<string,any>) => void|unknown
+  resetRowsSelectedTrigger? : unknown
   columns: ({
     name: string;
     header: string;
@@ -26,13 +28,18 @@ interface TableProps {
     type?: undefined;
 })[]
 }
-export function Table({data, columns, checkboxColumn} : TableProps) {
+export function Table({data, columns, checkboxColumn, handleOnSelectionChange, resetRowsSelectedTrigger} : TableProps) {
+	useEffect(() => {
+		setSelected({});
+		setSelectedLength(0);
+	}, [resetRowsSelectedTrigger]);
 	const {colorTheme} = useContext(DarkMode);
 	const [selected, setSelected] = useState<TypeRowSelection>({ });
 	const [selectedLength, setSelectedLength] = useState(0);
 	const onSelectionChange = useCallback(({selected} : TypeOnSelectionChangeArg| Record<string,any>) => {
 		setSelectedLength(Object.keys(selected).length);
 		setSelected(selected);
+		handleOnSelectionChange && handleOnSelectionChange(selected);
 	}, []);
 	return (
 		<>

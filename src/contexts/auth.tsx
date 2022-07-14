@@ -31,9 +31,9 @@ interface ISignUpParams {
 interface ICreateContextData {
   user: User|null
   signOut: () => void
+  signUp: ({username, email, password} : ISignUpParams) => Promise<boolean>
   signIn: ({email, password} : ISignInParams) =>  Promise<boolean>
   isAuthenticated: () => boolean
-  // signUp: ({username,email, password} : ISignUpParams) =>  boolean
 }
 const localStorageTokenKey = "@guisolidapi:token";
 export const AuthContext = createContext({} as ICreateContextData);
@@ -67,6 +67,19 @@ export function AuthProvider(props : AuthProvider) {
 
 		return token ? true : false;
 	}
+
+	async function signUp({username,email, password} : ISignUpParams) {
+		try {
+			const {status} = await api.post(`users`, {
+				username,
+				email,
+				password
+			});
+			return status === 201; 
+		} catch(err) {
+			return false;
+		} 
+	}
 	async function signIn({email,password} : ISignInParams) : Promise<boolean> {
 		try {
 			const {data : { user , token } } = await api.post<ISignInResponse>("users/authenticate", {email,password});
@@ -75,13 +88,12 @@ export function AuthProvider(props : AuthProvider) {
 			setUser(user);
 			return true;
 		} catch (err) {
-			signOut();
 			return false;
 		}
-    
+  
 	}
 	return (
-		<AuthContext.Provider value = {{user, signOut, signIn, isAuthenticated}}>
+		<AuthContext.Provider value = {{user, signOut, signUp, signIn, isAuthenticated}}>
 			{props.children}
 		</AuthContext.Provider>
 	);

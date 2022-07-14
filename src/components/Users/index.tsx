@@ -77,10 +77,11 @@ export function Users() {
 				confirmButtonText: "Sim, prosseguir!"
 			});
 			if(isConfirmed) {
+				await api.delete(`users?ids=${selectedUsersId.join()}`);
 				const users = await fetchUsers();
 				setRows(users.filter(tableUsers => tableUsers.id !==  user?.id));
 				setSelectedUsersId([]);
-				Swal.fire("Deletado!", "Usuário deletado com sucesso!", "success");
+				Swal.fire("Deletado!", "Usuários deletado com sucesso!", "success");
 			}
 		} catch( err ) {
 			Swal.fire("Algo deu errado", "Algo deu errado! Tente novamente", "error");
